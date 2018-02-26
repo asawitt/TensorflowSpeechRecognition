@@ -18,31 +18,18 @@ def get_all_wave_filenames(category = None):
 			if filename.endswith('.wav'):
 				yield os.path.join(category,filename)
 
-#Generates all wave files
-# def get_all_wave_files():
-# 	for filename in get_all_wave_filenames():
-# 		yield read_wave_file(filename)
-
-# #Reads a wave file given a filename
-# def read_wave_file(filename):
-# 	sample_rate, samples = wavfile.read(filename)
-# 	frequencies, times, spectogram = signal.spectrogram(samples, sample_rate)
-	
-# 	plt.imshow(spectogram)
-# 	plt.pcolormesh(times, frequencies, spectogram)
-# 	plt.ylabel('Frequency [Hz]')
-# 	plt.xlabel('Time [sec]')
-# 	plt.show()
-
 def get_all_datapoints():
 	for category in get_all_categories():
-		for filename in get_all_wave_filenames(category):
-			yield Datapoint(os.path.basename(os.path.normpath(category)),filename) 
+		for index,filename in enumerate(get_all_wave_filenames(category)):
+			yield Datapoint(os.path.basename(os.path.normpath(category)),filename, index) 
+			if index == 3:
+				break
 
 class Datapoint:
-	def __init__(self, category, filename):
+	def __init__(self, category, filename, index):
 		self.filename = filename
 		self.category = category
+		self.index = index
 
 	def __str__(self):
 		return "{}: {}".format(self.category,self.filename)
