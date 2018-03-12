@@ -8,7 +8,16 @@ import numpy as np
 UNPROCESSED_WAVE_DIRECTORY = '../Datasets/Training/Unprocessed/'
 PROCESSED_WAVE_DIRECTORY = '../Datasets/Training/Processed/'
 
-#Fenerates absolute path for all dirs in UNPROCESSED_WAVE_DIRECTORY that don't begin with "_"
+
+def get_all_base_categories(directory=PROCESSED_WAVE_DIRECTORY):
+    categories = []
+    for category in os.listdir(directory):
+        if os.path.isdir(os.path.join(directory,category)) and category [0] != "_":
+            categories.append(category)
+
+    return categories
+
+#Generates absolute path for all dirs in UNPROCESSED_WAVE_DIRECTORY that don't begin with "_"
 def get_all_categories(directory):
     for category in os.listdir(directory):
         if os.path.isdir(os.path.join(directory,category)) and category [0] != "_":
