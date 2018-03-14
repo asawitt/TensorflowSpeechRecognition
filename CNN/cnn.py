@@ -5,25 +5,28 @@
 import os
 import sys
 
-sys.path.append('/home/campus/adrien.gaste/Documents/COMP599/TensorflowSpeechRecognition/Preprocessing')
+sys.path.append('/home/campus/adrien.gaste/Documents/TensorflowSpeechRecognition/Preprocessing')
 
 import FileUtil
 
 
+sys.argv[0]
+
 TRAINING_DIRECTORY = '../Datasets/Training/Processed'
-BASE_CATEGORIES = FileUtil.get_all_base_categories()
+#~ #EVALUATION_DIRECTORY = '../Datasets/Evaluation/Processed'
+#~ BASE_CATEGORIES = FileUtil.get_all_base_categories()
 
-ONE_HOT = get_one_hot(BASE_CATEGORIES)
+#~ #ONE_HOT = get_one_hot(BASE_CATEGORIES)
 
-def one_hot(categories):
-	one_hot = {category:[0]*(len(categories)) for category in categories}
-	index = 0
-	for key,val in enumerate(categories.items()):
-		val[category][index] = 1
-		index += 1
-	return one_hot
+#~ def one_hot(categories):
+	#~ one_hot = {category:[0]*(len(categories)) for category in categories}
+	#~ index = 0
+	#~ for key,val in enumerate(categories.items()):
+		#~ val[category][index] = 1
+		#~ index += 1
+	#~ return one_hot
 	
-print(ONE_HOT)
+#~ #print(ONE_HOT)
 	
 
 def cnnClassifier(features,labels,mode):
@@ -60,6 +63,7 @@ def cnnClassifier(features,labels,mode):
 	# Logits Layer
 	logits = tf.layers.dense(inputs=dropout, units=2)
 
+	# Predictions
 	predictions = {
 	  # Generate predictions (for PREDICT and EVAL mode)
 	  "classes": tf.argmax(input=logits, axis=1),
@@ -67,9 +71,15 @@ def cnnClassifier(features,labels,mode):
 	  # `logging_hook`.
 	  "probabilities": tf.nn.softmax(logits, name="softmax_tensor")
 	}
-
 	if mode == tf.estimator.ModeKeys.PREDICT:
 		return tf.estimator.EstimatorSpec(mode=mode, predictions=predictions)
+		
+	# One-hot encoding
+	onehot_labels = tf.one_hot(indices=tf.cast(labels, tf.int32), depth=2)
+	loss = tf.losses.softmax_cross_entropy(
+    onehot_labels=onehot_labels, logits=logits)
+
+	
 
 	# Calculate Loss (for both TRAIN and EVAL modes)
 	loss = tf.losses.sparse_softmax_cross_entropy(labels=labels, logits=logits)
@@ -97,7 +107,7 @@ def main(unused_argv):
 		files = misc.imread()
 		train_data.append(files)
 	train_labels = np.array()
-	train_labels.append(one_hot[category])
+	
 	
 	# Estimator class
 	scd_classifier = tf.estimator.Estimator(
@@ -117,17 +127,17 @@ def main(unused_argv):
 		shuffle=True)
 	scd_classifier.train(
 		input_fn=train_input_fn,
-		steps=20000,
+		steps=2000,
 		hooks=[logging_hook])
 		
-		
+	
 	# Load eval data and labels
 	eval_data = np.array()
 	for f in get_all_processed_filenames(): # Change method for eval data fetching
 		files = misc.imread()
 		eval_data.append(files)
 	eval_labels = np.array()
-	eval_labels.append(one_hot[category]) # Change one_hot method for eval labels
+	
 		
 	# Evaluate the model and print results
 	eval_input = tf.estimator.inputs.numpy_input_fn(
