@@ -103,10 +103,14 @@ def cnnClassifier(features,labels,mode):
 def main(unused_argv):
 	# Load training data and labels
 	train_data = np.array()
+	train_labels = np.array()
 	for f in get_all_processed_filenames():
 		files = misc.imread()
 		train_data.append(files)
-	train_labels = np.array()
+		path = os.path.dirname(f)
+		label = os.path.basename(path)
+		if (np.any[:,0] != label):
+			train_labels.append(label)
 	
 	
 	# Estimator class
@@ -133,10 +137,14 @@ def main(unused_argv):
 	
 	# Load eval data and labels
 	eval_data = np.array()
+	eval_labels = np.array()
 	for f in get_all_processed_filenames(): # Change method for eval data fetching
 		files = misc.imread()
 		eval_data.append(files)
-	eval_labels = np.array()
+		path = os.path.dirname(f)
+		label = os.path.basename(path)
+		if (np.any[:,0] != label):
+			eval_labels.append(label)
 	
 		
 	# Evaluate the model and print results
