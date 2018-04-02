@@ -1,4 +1,6 @@
 import os
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from scipy.io import wavfile
 from scipy import signal
@@ -8,10 +10,9 @@ import numpy as np
 UNPROCESSED_WAVE_DIRECTORY = '../Datasets/Training/Unprocessed/'
 PROCESSED_WAVE_DIRECTORY = '../Datasets/Training/Processed/'
 
-
 def get_all_base_categories(directory=PROCESSED_WAVE_DIRECTORY):
     categories = []
-    for category in os.listdir(directory):
+    for category in os.listdir(direcory):
         if os.path.isdir(os.path.join(directory,category)) and category [0] != "_":
             categories.append(category)
 
@@ -35,6 +36,8 @@ def get_all_wave_filenames(category = None):
 
 def get_all_datapoints():
     for category in get_all_categories(UNPROCESSED_WAVE_DIRECTORY):
+        if not 'cat' in category and not 'dog' in category:
+            continue
         for index,filename in enumerate(get_all_wave_filenames(category)):
             yield Datapoint(os.path.basename(os.path.normpath(category)),filename, index) 
 
@@ -60,7 +63,7 @@ def save_dp_as_image(datapoint,directory,filename,window_size=20,step_size=10,ep
 
     spectrogram = np.log(spectrogram.T.astype(np.float32) + eps)
 
-    fig = plt.figure(figsize=(14, 8))
+    fig = plt.figure(figsize=(1.5, 1.4), dpi=50) # 350 x 200
 
     ax2 = fig.add_subplot(111)
     ax2.imshow(spectrogram.T, aspect='auto', origin='lower', 
