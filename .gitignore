@@ -1,2 +1,3 @@
-Datasets
+Datasets/*
 __pycache__/
+*.json
