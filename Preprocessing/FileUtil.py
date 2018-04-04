@@ -7,8 +7,8 @@ from scipy import signal
 import numpy as np
 
 
-UNPROCESSED_WAVE_DIRECTORY = '../Datasets/Training/Unprocessed/'
-PROCESSED_WAVE_DIRECTORY = '../Datasets/Training/Processed/'
+UNPROCESSED_WAVE_DIRECTORY = '../Datasets/Test/test/'
+PROCESSED_WAVE_DIRECTORY = '../Datasets/Test/Processed/'
 
 def get_all_base_categories(directory=PROCESSED_WAVE_DIRECTORY):
     categories = []
@@ -36,8 +36,6 @@ def get_all_wave_filenames(category = None):
 
 def get_all_datapoints():
     for category in get_all_categories(UNPROCESSED_WAVE_DIRECTORY):
-        if not 'cat' in category and not 'dog' in category:
-            continue
         for index,filename in enumerate(get_all_wave_filenames(category)):
             yield Datapoint(os.path.basename(os.path.normpath(category)),filename, index) 
 
