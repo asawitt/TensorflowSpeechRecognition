@@ -18,14 +18,26 @@ import PIL
 
 from sklearn.utils import shuffle
 
-num_epochs = 30
-batch_size = 20
+num_epochs = 50
+batch_size = 100
 
 IMG_WIDTH = 60
 IMG_HEIGHT = 65
 
 training_base_directory = "../Datasets/Training/Processed/"
-categories = ['cat','dog']
+output_model_filename = '60x65_all_labels.h5'
+
+categories = [
+	'bed', 'dog', 'five', 'happy', 'marvin', 
+	'off', 'right', 'six', 'tree', 'wow', 'bird', 
+	'down', 'four', 'house', 'nine', 'on', 
+	'seven', 'stop', 'two', 'yes', 'cat', 'eight', 
+	'go', 'left', 'no', 'one', 'sheila', 'three', 
+	'up', 'zero', 'silence'
+]
+
+
+
 num_categories = len(categories)
 cat_to_index = {cat:i for i,cat in enumerate(categories)}
 
@@ -45,7 +57,7 @@ def make_model():
 	model.add(Dense(128, activation='relu'))
 	model.add(Dropout(0.5))
 	model.add(Dense(num_categories, activation='softmax'))
-	loss_function = keras.losses.binary_crossentropy
+	loss_function = keras.losses.categorical_crossentropy
 	model.compile(loss=loss_function,
 		optimizer=keras.optimizers.Adadelta(),
 		metrics=['accuracy'])
@@ -76,6 +88,10 @@ def main():
 	train_labels = []
 
 	index = 0
+	num_datapoints = 0
+	for category in categories:
+		num_datapoints += len(os.listdir(os.path.join(training_base_directory,category)))
+
 	for category in categories:
 		print("Now working on ", category + "s")
 		training_directory = os.path.join(training_base_directory,category)
@@ -85,11 +101,9 @@ def main():
 			img = normalize(np.asarray(PIL.Image.open(filename),dtype=np.float32))
 			train_data.append(img)
 			train_labels.append(label)
-			print(100*index/800,"% done")
+			if (not index % 25):
+				print(100*index/num_datapoints,"% done")
 			index += 1
-			if not index % 400:
-				break
-
 
 	train_data = np.array(train_data).reshape(len(train_data),IMG_WIDTH,IMG_HEIGHT,1)
 	train_labels=np.array(train_labels)
@@ -97,8 +111,8 @@ def main():
 
 	print("Done reading data, fitting data...")
 	model = make_model()
-	model.fit(train_data,train_labels,epochs=num_epochs,batch_size=batch_size,validation_split=.2)
-	# model.save('trained_digits_vs_letters_200bs_15epochs_scaled.h5')
+	model.fit(train_data,train_labels,epochs=num_epochs,batch_size=batch_size,validation_split=.1)
+	model.save(output_model_filename)
 
 if __name__=="__main__":
 	main()
